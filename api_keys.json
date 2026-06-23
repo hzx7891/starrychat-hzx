@@ -1,0 +1,18 @@
+{
+  "2": {
+    "password": "2",
+    "apiKey": "981exaf2czld8v0rkr1bjm",
+    "usage": 0,
+    "sendUsage": 2,
+    "date": "Thu Jun 18 2026",
+    "dailyLimit": 20,
+    "registeredAt": "2026-06-18T10:30:04.907Z"
+  },
+  "hzx": {
+    "password": "666",
+    "apiKey": "maxuvz06rj9b8w1przsch",
+    "usage": 10,
+    "date": "Thu Jun 18 2026",
+    "sendUsage": 5
+  }
+}

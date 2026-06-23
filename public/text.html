@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>渲染测试</title>
+<style>
+  body { background:#1e1e1e; font-family:'Segoe UI',sans-serif; }
+  #chatMessages {
+    flex:1; overflow-y:auto; padding:20px; display:flex; flex-direction:column; gap:8px;
+    background:#111; min-height:300px; border:2px solid red;
+    width:500px; margin:50px auto;
+  }
+  .msg { display:flex; align-items:flex-start; gap:8px; padding:10px 14px; border-radius:12px; max-width:70%; word-break:break-word; }
+  .msg.self { align-self:flex-end; background:#95ec69; color:#000; }
+  .msg.other { align-self:flex-start; background:#333; color:#ccc; }
+  .avatar { width:32px; height:32px; border-radius:50%; object-fit:cover; flex-shrink:0; }
+  .msg-content { flex:1; }
+</style>
+</head>
+<body>
+<div id="chatMessages"></div>
+<button onclick="testAppend()" style="display:block; margin:20px auto; padding:10px 20px; font-size:16px;">添加消息</button>
+<button onclick="testMany()" style="display:block; margin:20px auto; padding:10px 20px; font-size:16px;">添加多条消息</button>
+
+<script>
+const container = document.getElementById('chatMessages');
+
+function getDefaultAvatar(nick) {
+  return "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='50' fill='%234ec9b0'/%3E%3Ctext x='50' y='70' font-size='50' text-anchor='middle' fill='white'%3E" + (nick?.[0] || "?") + "%3C/text%3E%3C/svg%3E";
+}
+
+function appendMessage(msg, isSelf) {
+  const div = document.createElement("div");
+  div.className = "msg " + (isSelf ? "self" : "other");
+  div.style.display = "flex";
+  div.style.alignItems = "flex-start";
+  div.style.gap = "8px";
+  div.style.padding = "10px 14px";
+  div.style.borderRadius = "12px";
+  div.style.maxWidth = "70%";
+  div.style.wordBreak = "break-word";
+  div.style.marginBottom = "4px";
+  div.style.background = isSelf ? "#95ec69" : "#333";
+  div.style.color = isSelf ? "#000" : "#ccc";
+  div.style.alignSelf = isSelf ? "flex-end" : "flex-start";
+
+  const avatarHtml = `<img class="avatar" src="${msg.avatar || getDefaultAvatar(msg.nickname || '??')}" />`;
+  let contentHtml = "";
+  if (!isSelf) contentHtml += `<div style="font-size:0.8rem;color:#aaa;">${msg.nickname || '匿名'}</div>`;
+  if (msg.type === "image") {
+    contentHtml += `<img src="${msg.content}" style="max-width:200px;border-radius:8px;margin-top:5px;" />`;
+  } else if (msg.type === "video") {
+    contentHtml += `<video src="${msg.content}" controls width="200" style="border-radius:8px;margin-top:5px;"></video>`;
+  } else if (msg.type === "file") {
+    const btn = document.createElement('button');
+    btn.textContent = '📎 下载 ' + (msg.filename || '文件');
+    btn.style.cssText = 'background:none;border:none;color:#4ec9b0;cursor:pointer;text-decoration:underline;padding:0;font:inherit;';
+    btn.onclick = () => {
+      try {
+        const byteString = atob(msg.content.split(',')[1]);
+        const mimeType = msg.content.split(',')[0].split(':')[1].split(';')[0];
+        const ab = new ArrayBuffer(byteString.length);
+        const ia = new Uint8Array(ab);
+        for (let i = 0; i < byteString.length; i++) ia[i] = byteString.charCodeAt(i);
+        const blob = new Blob([ab], { type: mimeType });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a'); a.href = url; a.download = msg.filename || 'download'; a.click(); URL.revokeObjectURL(url);
+      } catch (err) { alert('下载失败，请重试'); }
+    };
+    div.innerHTML = avatarHtml + '<div class="msg-content">' + (isSelf ? '' : '<div style="font-size:0.8rem;color:#aaa;">' + msg.nickname + '</div>') + '</div>';
+    div.querySelector('.msg-content').appendChild(btn);
+    container.appendChild(div);
+    return;
+  } else {
+    const text = String(msg.content).replace(/(https?:\/\/[^\s]+)/g, '<a href="$1" target="_blank">$1</a>');
+    contentHtml += text;
+  }
+  div.innerHTML = avatarHtml + '<div class="msg-content">' + contentHtml + '</div>';
+  container.appendChild(div);
+}
+
+function testAppend() {
+  appendMessage({ nickname: '测试', content: '你好，这是测试消息！', type: 'text', avatar: '' }, true);
+  appendMessage({ nickname: '别人', content: '这是别人的消息', type: 'text', avatar: '' }, false);
+}
+
+function testMany() {
+  for (let i = 0; i < 5; i++) {
+    appendMessage({ nickname: '用户' + i, content: '消息内容 ' + i, type: 'text', avatar: '' }, i % 2 === 0);
+  }
+}
+
+// 页面加载时自动添加一条
+window.onload = () => {
+  appendMessage({ nickname: '自动', content: '页面加载时的测试消息', type: 'text', avatar: '' }, true);
+};
+</script>
+</body>
+</html>

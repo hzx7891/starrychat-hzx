@@ -1,0 +1,15 @@
+﻿{
+  "name": "星迹 StarryChat",
+  "short_name": "星迹",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#1e1e1e",
+  "theme_color": "#07c160",
+  "icons": [
+    {
+      "src": "favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    }
+  ]
+}
