@@ -5,7 +5,9 @@
   "main": "db.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node server.js"
+    "start": "node server.js",
+    "deploy": "wrangler deploy",
+    "preview": "wrangler dev"
   },
   "keywords": [],
   "author": "",
@@ -15,5 +17,8 @@
     "express": "^5.2.1",
     "sql.js": "^1.14.1",
     "ws": "^8.21.0"
+  },
+  "devDependencies": {
+    "wrangler": "^4.110.0"
   }
 }
